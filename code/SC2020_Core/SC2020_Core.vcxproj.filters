@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Data">
+      <UniqueIdentifier>{b6c1b352-9672-4ad7-86e3-981356882677}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Bot">
+      <UniqueIdentifier>{5a4a0f50-ada6-4ac8-ba6b-348d1e4572f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game">
+      <UniqueIdentifier>{876d0db7-5f28-43a5-82b8-ea02e2179740}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ECellTypeFlag.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="InputData.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="GameConfig.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Core_PCH.h" />
+    <ClInclude Include="Bot.h">
+      <Filter>Bot</Filter>
+    </ClInclude>
+    <ClInclude Include="OutputData.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="OutputCommand.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandHelper.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Core_PCH.cpp" />
+    <ClCompile Include="Bot.cpp">
+      <Filter>Bot</Filter>
+    </ClCompile>
+    <ClCompile Include="CommandHelper.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
