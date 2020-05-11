@@ -13,10 +13,12 @@ using namespace std;
 void ReadInitInData(SInitInputData& data)
 {
     cin >> data.m_map.m_width >> data.m_map.m_height; cin.ignore();
+    cerr << data.m_map.m_width << " " << data.m_map.m_height << "\n";
     data.m_map.m_rows.resize(data.m_map.m_height);
     for(auto& row: data.m_map.m_rows)
     {
         getline(cin, row);
+        cerr << row << "\n";
     }
 }
 
@@ -61,7 +63,6 @@ void PrintOutData(SOutputData const& data)
     }
     outputStr.pop_back();
     printf("%s\n", outputStr.c_str());
-    cerr << outputStr.c_str() << "\n";
 }
 
 int main()
