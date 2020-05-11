@@ -7,6 +7,7 @@ template<typename TComponent>
 struct SVec2Base
 {
     static const size_t ms_vecSize = 2;
+    using ValueType = TComponent;
 
     template<typename TOtherComponent>
     explicit SVec2Base(SVec2Base<TOtherComponent> const other) 
@@ -66,4 +67,4 @@ using SVec2si = SVec2Base<short>;
 using SVec2su = SVec2Base<unsigned short>;
 
 // Set default for your project
-using SVec2 = SVec2si;
+using SVec2 = SVec2Base<char>;

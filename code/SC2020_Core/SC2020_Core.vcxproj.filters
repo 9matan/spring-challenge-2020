@@ -10,15 +10,12 @@
     <Filter Include="Game">
       <UniqueIdentifier>{876d0db7-5f28-43a5-82b8-ea02e2179740}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\Map">
+      <UniqueIdentifier>{9d37a5b0-e602-46fa-8203-47924d789067}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ECellTypeFlag.h">
-      <Filter>Data</Filter>
-    </ClInclude>
     <ClInclude Include="InputData.h">
-      <Filter>Data</Filter>
-    </ClInclude>
-    <ClInclude Include="GameConfig.h">
       <Filter>Data</Filter>
     </ClInclude>
     <ClInclude Include="Core_PCH.h" />
@@ -34,6 +31,21 @@
     <ClInclude Include="CommandHelper.h">
       <Filter>Game</Filter>
     </ClInclude>
+    <ClInclude Include="Cell.h">
+      <Filter>Game\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="GameConfig.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Map.h">
+      <Filter>Game\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="MapHelper.h">
+      <Filter>Game\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="BotData.h">
+      <Filter>Bot</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core_PCH.cpp" />
@@ -42,6 +54,9 @@
     </ClCompile>
     <ClCompile Include="CommandHelper.cpp">
       <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="MapHelper.cpp">
+      <Filter>Game\Map</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
