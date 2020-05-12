@@ -46,6 +46,9 @@
     <ClInclude Include="BotData.h">
       <Filter>Bot</Filter>
     </ClInclude>
+    <ClInclude Include="GameGrid2D.h">
+      <Filter>Game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core_PCH.cpp" />

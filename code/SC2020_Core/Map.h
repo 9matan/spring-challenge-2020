@@ -4,37 +4,16 @@
 
 #include "Cell.h"
 #include "GameConfig.h"
+#include "GameGrid2D.h"
 
 namespace SC2020
 {
-    struct SMap
+    struct SMap : public SGameGrid2D<SCell>
     {
     public:
-        SMap()
-            : m_width(0)
-            , m_height(0)
-        {}
-        SMap(size_t const width, size_t const height)
-            : m_width(width)
-            , m_height(height)
-        {
-            m_cells.resize(width * height);
-        }
+        using SGameGrid2D<SCell>::SGameGrid2D;
 
-        // x, y
-        inline SCell const& GetCell(SVec2 const pos) const { return m_cells[GetIndex(pos)]; }
-        inline SCell& GetCell(SVec2 const pos) { return m_cells[GetIndex(pos)]; }
-
-        inline size_t GetWidth() const { return m_width; }
-        inline size_t GetHeight() const { return m_height; }
-        inline size_t GetSize() const { return m_cells.size(); }
-
-        inline bool IsValid(SVec2 const pos) const { return pos[0] >= 0 && pos[0] < m_width && pos[1] >= 0 && pos[1] < m_height; }
-        inline size_t GetIndex(SVec2 const pos) const { return pos[0] + pos[1] * m_width; }
-
-    private:
-        CVectorInPlace<SCell, MAX_MAP_HEIGHT * MAX_MAP_WIDTH> m_cells;
-        size_t m_width;
-        size_t m_height;
+        inline SCell const& GetCell(SVec2 const pos) const { return GetElement(pos); }
+        inline SCell& GetCell(SVec2 const pos) { return GetElement(pos); }
     };
 }

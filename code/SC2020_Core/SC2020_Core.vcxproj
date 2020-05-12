@@ -159,6 +159,7 @@
     <ClInclude Include="CommandHelper.h" />
     <ClInclude Include="Core_PCH.h" />
     <ClInclude Include="GameConfig.h" />
+    <ClInclude Include="GameGrid2D.h" />
     <ClInclude Include="InputData.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="MapHelper.h" />

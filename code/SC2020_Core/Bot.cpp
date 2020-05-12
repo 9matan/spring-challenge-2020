@@ -6,6 +6,7 @@
 #include "CodingameUtility\Vec2Helper.h"
 
 #include "InputData.h"
+#include "MapHelper.h"
 
 #define RNG(container)  container.begin(), container.end()
 
@@ -49,14 +50,19 @@ namespace SC2020
         return cells;
     }
 
-    SOutputData CBot::FirstUpdate(SInitInputData const& initInData, SInputData const& inData)
+    CBot::CBot(SInitInputData const& initInData)
     {
         auto const seed = InitializeRandom();
         cerr << "Seed: " << seed << "\n";
 
+        m_data.m_map = BuildMap(initInData.m_map);
+
         m_floorCells = CollectFloorCells(initInData.m_map);
         random_shuffle(RNG(m_floorCells));
+    }
 
+    SOutputData CBot::FirstUpdate(SInputData const& inData)
+    {
         return Update(inData);
     }
 
@@ -101,7 +107,6 @@ namespace SC2020
             SVec2 moveTo(0, 0);
             if (!pellets.empty() || !superPellets.empty())
             {
-
                 SVec2* moveToIter = !superPellets.empty()
                     ? FindClosestPos(RNG(superPellets), pacPos)
                     : FindClosestPos(RNG(pellets), pacPos);

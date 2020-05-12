@@ -67,16 +67,17 @@ void PrintOutData(SOutputData const& data)
 
 int main()
 {
+
     SInitInputData initInData;
     initInData.m_map.m_rows.reserve(MAX_MAP_HEIGHT);
+    ReadInitInData(initInData);
+    SC2020::CBot bot(initInData);
+
     SInputData inData;
     inData.m_vissiblePellets.reserve(MAX_MAP_AREA);
     inData.m_vissiblePacs.reserve(MAX_PLAYERS_CNT * MAX_PACS_CNT_PER_PLAYER);
-    SC2020::CBot bot;
-
-    ReadInitInData(initInData);
     ReadInData(inData);
-    auto const outData = bot.FirstUpdate(initInData, inData);
+    auto const outData = bot.FirstUpdate(inData);
     PrintOutData(outData);
 
     while (true)

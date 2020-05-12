@@ -154,6 +154,7 @@
   <ItemGroup>
     <ClInclude Include="CodingameUtility_PCH.h" />
     <ClInclude Include="CommonDefs.h" />
+    <ClInclude Include="SGrid2DInPlace.h" />
     <ClInclude Include="Profiler.h" />
     <ClInclude Include="Random.h" />
     <ClInclude Include="Vec2.h" />

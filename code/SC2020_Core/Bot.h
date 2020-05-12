@@ -3,6 +3,7 @@
 #include "CodingameUtility\Vec2.h"
 #include "CodingameUtility\VectorInPlace.h"
 
+#include "BotData.h"
 #include "OutputData.h"
 
 namespace SC2020
@@ -13,10 +14,13 @@ namespace SC2020
     class CBot
     {
     public:
-        SOutputData FirstUpdate(SInitInputData const& initInData, SInputData const& inData);
+        CBot(SInitInputData const& initInData);
+
+        SOutputData FirstUpdate(SInputData const& inData);
         SOutputData Update(SInputData const& inData);
 
     private:
         CVectorInPlace<SVec2, MAX_MAP_AREA> m_floorCells;
+        SBotData m_data;
     };
 }
