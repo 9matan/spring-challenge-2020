@@ -11,8 +11,8 @@ struct SVec2Base
 
     template<typename TOtherComponent>
     explicit SVec2Base(SVec2Base<TOtherComponent> const other) 
-        : m_x(static_cast<TComponent>(other.m_x))
-        , m_y(static_cast<TComponent>(other.m_y)) 
+        : m_x(static_cast<TComponent>(other[0]))
+        , m_y(static_cast<TComponent>(other[1]))
     {}
 
     template<typename TOtherComponent>
