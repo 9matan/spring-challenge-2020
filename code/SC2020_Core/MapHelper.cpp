@@ -20,9 +20,12 @@ namespace SC2020
         {
             for (size_t x = 0; x < inDataMap.m_width; ++x)
             {
-                auto& cell = map.GetCell({ x, y });
-                cell.m_isFloor = rows[y][x] == ' ';
-            
+                if (inDataMap.m_rows[y][x] != ' ')
+                {
+                    continue;
+                }
+
+                auto& cell = map.GetCell({ x, y });            
                 for (auto const mask : ADJACENT_MASKS)
                 {
                     SVec2 newPos = mask + SVec2(x, y);

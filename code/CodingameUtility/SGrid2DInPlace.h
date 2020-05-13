@@ -9,10 +9,6 @@ template <typename TElem, size_t TMaxWidth, size_t TMaxHeight>
 struct SGrid2DInPlace
 {
 public:
-    SGrid2DInPlace()
-        : m_width(0)
-        , m_height(0)
-    {}
     SGrid2DInPlace(size_t const width, size_t const height)
         : m_width(width)
         , m_height(height)

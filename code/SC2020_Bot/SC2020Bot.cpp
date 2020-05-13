@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "CodingameUtility\Profiler.h"
+
 #include "SC2020_Core\CommandHelper.h"
 #include "SC2020_Core\Bot.h"
 #include "SC2020_Core\InputData.h"
@@ -70,18 +72,21 @@ int main()
 
     SInitInputData initInData;
     initInData.m_map.m_rows.reserve(MAX_MAP_HEIGHT);
-    ReadInitInData(initInData);
-    SC2020::CBot bot(initInData);
-
     SInputData inData;
     inData.m_vissiblePellets.reserve(MAX_MAP_AREA);
     inData.m_vissiblePacs.reserve(MAX_PLAYERS_CNT * MAX_PACS_CNT_PER_PLAYER);
+
+    CTimeProfiler profiler("FirstTurn");
+    ReadInitInData(initInData);
+    SC2020::CBot bot(initInData);
     ReadInData(inData);
     auto const outData = bot.FirstUpdate(inData);
     PrintOutData(outData);
+    profiler.~CTimeProfiler();
 
     while (true)
     {
+        PROFILE_TIME("Update");
         ReadInData(inData);
         auto const outData = bot.Update(inData);
         PrintOutData(outData);

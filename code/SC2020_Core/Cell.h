@@ -9,6 +9,5 @@ namespace SC2020
     {
         CVectorInPlace<SVec2, 4> m_adjacentCells;
         float m_pelletScore = 0.0f;
-        bool m_isFloor = false;
     };
 }

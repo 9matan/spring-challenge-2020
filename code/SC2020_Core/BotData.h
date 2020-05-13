@@ -1,11 +1,15 @@
 #pragma once
 
-#include "Map.h"
+#include <memory>
 
 namespace SC2020
 {
+    struct SMap;
+    class CNavmesh;
+
     struct SBotData
     {
-        SMap m_map;
+        std::unique_ptr<SMap> m_map;
+        std::unique_ptr<CNavmesh> m_navmesh;
     };
 }

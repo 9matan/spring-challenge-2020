@@ -6,7 +6,9 @@
 #include "CodingameUtility\Vec2Helper.h"
 
 #include "InputData.h"
+#include "Map.h"
 #include "MapHelper.h"
+#include "Navmesh.h"
 
 #define RNG(container)  container.begin(), container.end()
 
@@ -55,11 +57,14 @@ namespace SC2020
         auto const seed = InitializeRandom();
         cerr << "Seed: " << seed << "\n";
 
-        m_data.m_map = BuildMap(initInData.m_map);
+        m_data.m_map = make_unique<SMap>(BuildMap(initInData.m_map));
+        m_data.m_navmesh = make_unique<CNavmesh>(*m_data.m_map);
 
         m_floorCells = CollectFloorCells(initInData.m_map);
         random_shuffle(RNG(m_floorCells));
     }
+
+    CBot::~CBot() {}
 
     SOutputData CBot::FirstUpdate(SInputData const& inData)
     {

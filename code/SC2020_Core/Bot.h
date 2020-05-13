@@ -15,6 +15,7 @@ namespace SC2020
     {
     public:
         CBot(SInitInputData const& initInData);
+        ~CBot();
 
         SOutputData FirstUpdate(SInputData const& inData);
         SOutputData Update(SInputData const& inData);
