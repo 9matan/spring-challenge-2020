@@ -2,5 +2,18 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MapSamples.cpp">
+      <Filter>Samples</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Samples">
+      <UniqueIdentifier>{ac6aab5a-899d-4bbe-bd0d-a007ba5a84fa}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MapSamples.h">
+      <Filter>Samples</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

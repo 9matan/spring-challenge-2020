@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -161,8 +161,12 @@
     <ClInclude Include="GameConfig.h" />
     <ClInclude Include="GameGrid2D.h" />
     <ClInclude Include="InputData.h" />
+    <ClInclude Include="InputDataMap.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="MapHelper.h" />
+    <ClInclude Include="Navmesh.h" />
+    <ClInclude Include="NavmeshEdge.h" />
+    <ClInclude Include="NavmeshNode.h" />
     <ClInclude Include="OutputCommand.h" />
     <ClInclude Include="OutputData.h" />
   </ItemGroup>
@@ -176,6 +180,7 @@
     <ClCompile Include="CommandHelper.cpp" />
     <ClCompile Include="Core_PCH.cpp" />
     <ClCompile Include="MapHelper.cpp" />
+    <ClCompile Include="Navmesh.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

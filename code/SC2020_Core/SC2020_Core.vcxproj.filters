@@ -13,6 +13,9 @@
     <Filter Include="Game\Map">
       <UniqueIdentifier>{9d37a5b0-e602-46fa-8203-47924d789067}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Game\Navmesh">
+      <UniqueIdentifier>{00398c68-51cc-4d32-b156-2885110ea885}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="InputData.h">
@@ -49,6 +52,18 @@
     <ClInclude Include="GameGrid2D.h">
       <Filter>Game</Filter>
     </ClInclude>
+    <ClInclude Include="NavmeshNode.h">
+      <Filter>Game\Navmesh</Filter>
+    </ClInclude>
+    <ClInclude Include="NavmeshEdge.h">
+      <Filter>Game\Navmesh</Filter>
+    </ClInclude>
+    <ClInclude Include="Navmesh.h">
+      <Filter>Game\Navmesh</Filter>
+    </ClInclude>
+    <ClInclude Include="InputDataMap.h">
+      <Filter>Data</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core_PCH.cpp" />
@@ -60,6 +75,9 @@
     </ClCompile>
     <ClCompile Include="MapHelper.cpp">
       <Filter>Game\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="Navmesh.cpp">
+      <Filter>Game\Navmesh</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -148,6 +148,18 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MapSamples.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MapSamples.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CodingameUtility\CodingameUtility.vcxproj">
+      <Project>{af452180-93d9-4e15-958d-95fa020ffb47}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\SC2020_Core\SC2020_Core.vcxproj">
+      <Project>{74893e31-6382-41d9-8449-1393c77353d6}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
