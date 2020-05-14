@@ -44,4 +44,23 @@ namespace SC2020
 
         return map;
     }
+
+    CVectorInPlace<SVec2, MAX_MAP_AREA> GetVisibleCells(SMap const& map, SVec2 const origin)
+    {
+        CVectorInPlace<SVec2, MAX_MAP_AREA> result;
+        result.push_back(origin);
+        for (auto const lineDir : ADJACENT_MASKS)
+        {
+            auto* curCell = &map.GetCell(origin);
+            SVec2 nextPos = origin + lineDir;
+
+            while (find(curCell->m_adjacentCells.begin(), curCell->m_adjacentCells.end(), nextPos) != curCell->m_adjacentCells.end())
+            {
+                result.push_back(nextPos);
+                curCell = &map.GetCell(nextPos);
+                nextPos = nextPos + lineDir;
+            }
+        }
+        return result;
+    }
 }
