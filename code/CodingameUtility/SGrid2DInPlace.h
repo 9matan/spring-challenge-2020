@@ -28,6 +28,11 @@ public:
     inline bool IsValid(SVec2 const pos) const { return pos[0] >= 0 && pos[0] < m_width && pos[1] >= 0 && pos[1] < m_height; }
     inline size_t GetIndex(SVec2 const pos) const { return pos[0] + pos[1] * m_width; }
 
+    inline TElem* begin() { return m_elements.begin(); }
+    inline TElem* end() { return m_elements.end(); }
+    inline TElem const* begin() const { return m_elements.begin(); }
+    inline TElem const* end() const { return m_elements.end(); }
+
 private:
     CVectorInPlace<TElem, TMaxWidth * TMaxHeight> m_elements;
     size_t m_width;

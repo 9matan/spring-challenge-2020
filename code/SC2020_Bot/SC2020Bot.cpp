@@ -30,8 +30,8 @@ void ReadInData(SInputData& data)
     {
         int vissiblePacCount;
         cin >> vissiblePacCount; cin.ignore();
-        data.m_vissiblePacs.resize(vissiblePacCount);
-        for (auto& pacData : data.m_vissiblePacs)
+        data.m_visiblePacs.resize(vissiblePacCount);
+        for (auto& pacData : data.m_visiblePacs)
         {
             cin >> pacData.m_pacId
                 >> pacData.m_isMine
@@ -45,8 +45,8 @@ void ReadInData(SInputData& data)
     {
         int vissiblePelletCnt;
         cin >> vissiblePelletCnt; cin.ignore();
-        data.m_vissiblePellets.resize(vissiblePelletCnt);
-        for (auto& pelletData : data.m_vissiblePellets)
+        data.m_visiblePellets.resize(vissiblePelletCnt);
+        for (auto& pelletData : data.m_visiblePellets)
         {
             cin >> pelletData.m_x >> pelletData.m_y
                 >> pelletData.m_value;
@@ -73,8 +73,8 @@ int main()
     SInitInputData initInData;
     initInData.m_map.m_rows.reserve(MAX_MAP_HEIGHT);
     SInputData inData;
-    inData.m_vissiblePellets.reserve(MAX_MAP_AREA);
-    inData.m_vissiblePacs.reserve(MAX_PLAYERS_CNT * MAX_PACS_CNT_PER_PLAYER);
+    inData.m_visiblePellets.reserve(MAX_MAP_AREA);
+    inData.m_visiblePacs.reserve(MAX_PLAYERS_CNT * MAX_PACS_CNT_PER_PLAYER);
 
     CTimeProfiler profiler("FirstTurn");
     ReadInitInData(initInData);

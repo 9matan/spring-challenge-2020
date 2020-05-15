@@ -25,7 +25,8 @@ namespace SC2020
                     continue;
                 }
 
-                auto& cell = map.GetCell({ x, y });            
+                auto& cell = map.GetCell({ x, y });
+                cell.m_pelletScore = 1.0f;
                 for (auto const mask : ADJACENT_MASKS)
                 {
                     SVec2 newPos = mask + SVec2(x, y);

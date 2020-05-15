@@ -30,8 +30,8 @@ namespace SC2020
     {
         int m_myScore;
         int m_opponentScore;
-        std::vector<SInputDataPac> m_vissiblePacs;
-        std::vector<SInputDataPellet> m_vissiblePellets;
+        std::vector<SInputDataPac> m_visiblePacs;
+        std::vector<SInputDataPellet> m_visiblePellets;
     };
 
     struct SInitInputData

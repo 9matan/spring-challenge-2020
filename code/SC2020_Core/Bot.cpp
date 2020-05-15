@@ -17,39 +17,100 @@ using namespace std;
 namespace SC2020
 {
 
-    template<typename TIter>
-    TIter FindClosestPos(TIter b, TIter e, SVec2 const origin)
+    namespace
     {
-        TIter curMin = b;
-        for (TIter cur = b; cur != e; ++cur)
+        template<typename TIter>
+        TIter FindClosestPos(TIter b, TIter e, SVec2 const origin)
         {
-            if (GetDistanceL1(origin, *cur) < GetDistanceL1(origin, *curMin))
+            TIter curMin = b;
+            for (TIter cur = b; cur != e; ++cur)
             {
-                curMin = cur;
-            }
-        }
-        return curMin;
-    }
-
-    CVectorInPlace<SVec2, MAX_MAP_AREA> CollectFloorCells(SInputDataMap const& map)
-    {
-        CVectorInPlace<SVec2, MAX_MAP_AREA> cells;
-        int rIndx = 0;
-        int cIndx = 0;
-        for (auto const& row: map.m_rows)
-        {
-            cIndx = 0;
-            for (auto const cell : row)
-            {
-                if (cell == ' ')
+                if (GetDistanceL1(origin, *cur) < GetDistanceL1(origin, *curMin))
                 {
-                    cells.push_back({ cIndx, rIndx });
+                    curMin = cur;
                 }
-                ++cIndx;
             }
-            ++rIndx;
+            return curMin;
         }
-        return cells;
+
+        CVectorInPlace<SVec2, MAX_MAP_AREA> CollectFloorCells(SInputDataMap const& map)
+        {
+            CVectorInPlace<SVec2, MAX_MAP_AREA> cells;
+            int rIndx = 0;
+            int cIndx = 0;
+            for (auto const& row : map.m_rows)
+            {
+                cIndx = 0;
+                for (auto const cell : row)
+                {
+                    if (cell == ' ')
+                    {
+                        cells.push_back({ cIndx, rIndx });
+                    }
+                    ++cIndx;
+                }
+                ++rIndx;
+            }
+            return cells;
+        }
+
+        inline bool IsSuperPellet(float const score) { return score > 1.0f; }
+
+        vector<SVec2> GetSuperPelletPos(vector<SInputDataPellet> const& pellets)
+        {
+            vector<SVec2> res;
+            res.reserve(pellets.size());
+            for (auto& pellet : pellets)
+            {
+                if (IsSuperPellet((float)pellet.m_value))
+                {
+                    res.push_back({ pellet.m_x, pellet.m_y });
+                }
+            }
+            return res;
+        }
+
+        // updates
+        void UpdatePellets(SBotData& botData, SInputData const& inData)
+        {
+            // clear super pellets pos
+            for (auto const pos : botData.m_superPelletPos)
+            {
+                botData.m_map->GetCell(pos).m_pelletScore = 0.0f;
+            }
+            // clear visible pos
+            {
+                for (auto const pacData : inData.m_visiblePacs)
+                {
+                    if (!pacData.m_isMine)
+                    {
+                        continue;
+                    }
+                    SVec2 const pacPos(pacData.m_x, pacData.m_y);
+                    auto const visiblePos = GetVisibleCells(*botData.m_map, pacPos);
+
+                    for (auto const vPos : visiblePos)
+                    {
+                        botData.m_map->GetCell(vPos).m_pelletScore = 0.0f;
+                    }
+                }
+            }
+            // update from visible
+            for (auto const& pellet : inData.m_visiblePellets)
+            {
+                SVec2 const pelletPos(pellet.m_x, pellet.m_y);
+                botData.m_map->GetCell(pelletPos).m_pelletScore = (float)pellet.m_value;
+            }
+
+            for (size_t y = 0; y < botData.m_map->GetHeight(); ++y)
+            {
+                for (size_t x = 0; x < botData.m_map->GetWidth(); ++x)
+                {
+                    cerr << (int)(botData.m_map->GetElement({ x, y }).m_pelletScore + 0.0001f) << " ";
+                }
+                cerr << "\n";
+            }
+        }
     }
 
     CBot::CBot(SInitInputData const& initInData)
@@ -68,6 +129,7 @@ namespace SC2020
 
     SOutputData CBot::FirstUpdate(SInputData const& inData)
     {
+        m_data.m_superPelletPos = GetSuperPelletPos(inData.m_visiblePellets);
         return Update(inData);
     }
 
@@ -75,23 +137,31 @@ namespace SC2020
     {
         SOutputData output;
 
+        UpdatePellets(m_data, inData);
+
         CVectorInPlace<SVec2, MAX_MAP_AREA> superPellets;
         CVectorInPlace<SVec2, MAX_MAP_AREA> pellets;
-        for (auto const& pellet : inData.m_vissiblePellets)
+        for (auto const& pellet : inData.m_visiblePellets)
         {
             if (pellet.m_value > 1)
             {
                 superPellets.push_back({ pellet.m_x , pellet.m_y });
             }
-            else
+        }
+        for (size_t y = 0; y < m_data.m_map->GetHeight(); ++y)
+        {
+            for (size_t x = 0; x < m_data.m_map->GetWidth(); ++x)
             {
-                pellets.push_back({ pellet.m_x , pellet.m_y });
+                if (m_data.m_map->GetElement({x, y}).m_pelletScore > 0.001f)
+                {
+                    pellets.push_back({ x, y });
+                }
             }
         }
         //random_shuffle(RNG(superPellets));
         //random_shuffle(RNG(pellets));
 
-        for (auto const& pac : inData.m_vissiblePacs)
+        for (auto const& pac : inData.m_visiblePacs)
         {
             if (!pac.m_isMine)
             {
@@ -108,7 +178,6 @@ namespace SC2020
             }*/
 
             SVec2 const pacPos(pac.m_x, pac.m_y);
-
             SVec2 moveTo(0, 0);
             if (!pellets.empty() || !superPellets.empty())
             {
