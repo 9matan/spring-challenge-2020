@@ -49,9 +49,6 @@
     <ClInclude Include="MapHelper.h">
       <Filter>Game\Map</Filter>
     </ClInclude>
-    <ClInclude Include="BotData.h">
-      <Filter>Bot</Filter>
-    </ClInclude>
     <ClInclude Include="GameGrid2D.h">
       <Filter>Game</Filter>
     </ClInclude>

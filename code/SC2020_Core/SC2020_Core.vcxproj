@@ -154,7 +154,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Bot.h" />
-    <ClInclude Include="BotData.h" />
     <ClInclude Include="BotImpl.h" />
     <ClInclude Include="Cell.h" />
     <ClInclude Include="CommandHelper.h" />

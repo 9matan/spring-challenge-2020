@@ -76,13 +76,15 @@ int main()
     inData.m_visiblePellets.reserve(MAX_MAP_AREA);
     inData.m_visiblePacs.reserve(MAX_PLAYERS_CNT * MAX_PACS_CNT_PER_PLAYER);
 
-    CTimeProfiler profiler("FirstTurn");
-    ReadInitInData(initInData);
-    SC2020::CBot bot(initInData);
-    ReadInData(inData);
-    auto const outData = bot.FirstUpdate(inData);
-    PrintOutData(outData);
-    profiler.~CTimeProfiler();
+    
+    SC2020::CBot bot;
+    {
+        PROFILE_TIME("First update");
+        ReadInitInData(initInData);
+        ReadInData(inData);
+        auto const outData = bot.FirstUpdate(initInData, inData);
+        PrintOutData(outData);
+    }
 
     while (true)
     {

@@ -1,27 +1,25 @@
 #pragma once
 
-#include "CodingameUtility\Vec2.h"
-#include "CodingameUtility\VectorInPlace.h"
+#include <memory>
 
-#include "BotData.h"
 #include "OutputData.h"
 
 namespace SC2020
 {
+    class CBotImpl;
     struct SInitInputData;
     struct SInputData;
 
     class CBot
     {
     public:
-        CBot(SInitInputData const& initInData);
+        CBot();
         ~CBot();
 
-        SOutputData FirstUpdate(SInputData const& inData);
+        SOutputData FirstUpdate(SInitInputData const& initInData, SInputData const& inData);
         SOutputData Update(SInputData const& inData);
 
     private:
-        CVectorInPlace<SVec2, MAX_MAP_AREA> m_floorCells;
-        SBotData m_data;
+        std::unique_ptr<CBotImpl> m_impl;
     };
 }
