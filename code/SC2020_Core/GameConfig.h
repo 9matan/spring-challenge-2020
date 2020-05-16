@@ -1,5 +1,8 @@
 #pragma once
 
+#define DEBUG_VALIDATE_ERRORS
+#define DEBUG_WARNINGS_ENABLED
+
 constexpr int MAX_PLAYERS_CNT = 2;
 constexpr int MAX_PACS_CNT_PER_PLAYER = 5;
 

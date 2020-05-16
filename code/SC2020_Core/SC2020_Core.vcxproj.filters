@@ -19,6 +19,9 @@
     <Filter Include="Bot\Pac">
       <UniqueIdentifier>{44161a8d-15b9-49f7-ab9e-86d9ba7e0468}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Bot\Pathfinding">
+      <UniqueIdentifier>{827625c0-3f79-4be4-92aa-333e837470aa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="InputData.h">
@@ -82,6 +85,12 @@
     <ClInclude Include="BotImpl.h">
       <Filter>Bot</Filter>
     </ClInclude>
+    <ClInclude Include="Pathfinding.h">
+      <Filter>Bot\Pathfinding</Filter>
+    </ClInclude>
+    <ClInclude Include="PathfindingConfigs.h">
+      <Filter>Bot\Pathfinding</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core_PCH.cpp" />
@@ -102,6 +111,9 @@
     </ClCompile>
     <ClCompile Include="BotImpl.cpp">
       <Filter>Bot</Filter>
+    </ClCompile>
+    <ClCompile Include="Pathfinding.cpp">
+      <Filter>Bot\Pathfinding</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

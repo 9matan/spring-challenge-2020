@@ -14,6 +14,6 @@ namespace SC2020
         using SGameGrid2D<SCell>::SGameGrid2D;
 
         inline SCell const& GetCell(SVec2 const pos) const { return GetElement(pos); }
-        inline SCell& GetCell(SVec2 const pos) { return GetElement(pos); }
+        inline SCell& ModifyCell(SVec2 const pos) { return ModifyElement(pos); }
     };
 }

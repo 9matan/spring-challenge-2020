@@ -15,6 +15,9 @@ namespace SC2020
         CNavmesh(SMap const& map);
 
         CVectorInPlace<SNavmeshEdge::Path, 4> GetPathsToAdjacentNodes(SVec2 const pos) const;
+        CVectorInPlace<SVec2, 4> GetAdjacentNodes(SVec2 const pos) const;
+        SNavmeshEdge::Path const& GetEdgePath(short const edgeId) const { return m_edges[edgeId].m_path; }
+        short GetEdgeId(SVec2 const pos) const { return m_navCells.GetElement(pos).m_edgeId; }
         //bool IsNode(SVec2 const pos) const;
         //SNavmeshEdge const& GetEdge(short const id) const;
     private:

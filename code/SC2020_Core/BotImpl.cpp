@@ -213,7 +213,7 @@ namespace SC2020
         // clear super pellets pos
         for (auto const pos : m_initSuperPelletPos)
         {
-            m_map.GetCell(pos).m_pelletScore = 0.0f;
+            m_map.ModifyCell(pos).m_pelletScore = 0.0f;
         }
         // clear visible pos
         {
@@ -228,7 +228,7 @@ namespace SC2020
 
                 for (auto const vPos : visiblePos)
                 {
-                    m_map.GetCell(vPos).m_pelletScore = 0.0f;
+                    m_map.ModifyCell(vPos).m_pelletScore = 0.0f;
                 }
             }
         }
@@ -236,7 +236,7 @@ namespace SC2020
         for (auto const& pellet : inData.m_visiblePellets)
         {
             SVec2 const pelletPos(pellet.m_x, pellet.m_y);
-            m_map.GetCell(pelletPos).m_pelletScore = (float)pellet.m_value;
+            m_map.ModifyCell(pelletPos).m_pelletScore = (float)pellet.m_value;
         }
 
         /*

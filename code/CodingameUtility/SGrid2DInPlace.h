@@ -19,7 +19,9 @@ public:
 
     // x, y
     inline TElem const& GetElement(SVec2 const pos) const { return m_elements[GetIndex(pos)]; }
-    inline TElem& GetElement(SVec2 const pos) { return m_elements[GetIndex(pos)]; }
+    inline TElem GetElementCopy(SVec2 const pos) const { return m_elements[GetIndex(pos)]; }
+    inline TElem& ModifyElement(SVec2 const pos) { return m_elements[GetIndex(pos)]; }
+    inline void SetElement(SVec2 const pos, TElem const& elem) { m_elements[GetIndex(pos)] = elem; }
 
     inline size_t GetWidth() const { return m_width; }
     inline size_t GetHeight() const { return m_height; }

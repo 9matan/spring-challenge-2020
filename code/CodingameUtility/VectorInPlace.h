@@ -13,6 +13,7 @@ public:
     { 
         reserve(items.size()); 
         std::copy(items.begin(), items.end(), begin());
+        m_nxtSlotIndex = items.size();
     }
 
     inline void push_back(T const& elem) { assert(m_nxtSlotIndex < TSize); m_data[m_nxtSlotIndex++] = elem; }
@@ -41,8 +42,8 @@ public:
     inline T const* begin() const { return m_data; }
     inline T const* end() const { return m_data + m_nxtSlotIndex; }
 
-    inline T& operator[](size_t const index) { return m_data[index]; }
-    inline T const& operator[](size_t const index) const { return m_data[index]; }
+    inline T& operator[](size_t const index) { assert(index < m_nxtSlotIndex); return m_data[index]; }
+    inline T const& operator[](size_t const index) const { assert(index < m_nxtSlotIndex); return m_data[index]; }
 
 private:
     size_t m_nxtSlotIndex = 0;

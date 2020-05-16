@@ -11,6 +11,17 @@ namespace SC2020
         SVec2(-1, 0), {1, 0}, {0, -1}, {0, 1}
     };
 
+    namespace
+    {
+        inline SVec2 AddVector(SVec2 const pos, SVec2 v, size_t const mapWidth)
+        {
+            SVec2 newPos = pos + v;
+            if (newPos[0] < 0) newPos[0] = (SVec2::ValueType)(mapWidth - 1);
+            if (newPos[0] >= (SVec2::ValueType)mapWidth) newPos[0] = 0;
+            return newPos;
+        }
+    }
+
     SMap BuildMap(SInputDataMap const& inDataMap)
     {
         SMap map(inDataMap.m_width, inDataMap.m_height);
@@ -25,7 +36,7 @@ namespace SC2020
                     continue;
                 }
 
-                auto& cell = map.GetCell({ x, y });
+                auto& cell = map.ModifyCell({ x, y });
                 cell.m_pelletScore = 1.0f;
                 for (auto const mask : ADJACENT_MASKS)
                 {
@@ -53,13 +64,13 @@ namespace SC2020
         for (auto const lineDir : ADJACENT_MASKS)
         {
             auto* curCell = &map.GetCell(origin);
-            SVec2 nextPos = origin + lineDir;
+            SVec2 nextPos = AddVector(origin, lineDir, map.GetWidth());
 
             while (find(curCell->m_adjacentCells.begin(), curCell->m_adjacentCells.end(), nextPos) != curCell->m_adjacentCells.end())
             {
                 result.push_back(nextPos);
                 curCell = &map.GetCell(nextPos);
-                nextPos = nextPos + lineDir;
+                nextPos = AddVector(nextPos, lineDir, map.GetWidth());
             }
         }
         return result;

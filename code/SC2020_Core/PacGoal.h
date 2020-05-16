@@ -14,7 +14,6 @@ namespace SC2020
     struct SPacGoal
     {
         EPacGoalType m_type;
-        // contains crossroads; the first pos - is the goal, the last pos - the next pos move to
-        CVectorInPlace<SVec2, 32> m_reversedPath;
+        SVec2 m_goalPos;
     };
 }

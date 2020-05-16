@@ -59,6 +59,35 @@ namespace SC2020
         return paths;
     }
 
+    CVectorInPlace<SVec2, 4> CNavmesh::GetAdjacentNodes(SVec2 const pos) const
+    {
+        CVectorInPlace<SVec2, 4> nodes;
+        auto const& navCell = m_navCells.GetElement(pos);
+        auto const& edgeIds = navCell.m_node.m_edgeIds;
+        if (!edgeIds.empty())
+        {
+            for (auto const edgeId : edgeIds)
+            {
+                auto const& edge = m_edges[edgeId];
+                if (edge.GetAPos() == pos)
+                {
+                    nodes.push_back(edge.GetBPos());
+                }
+                else
+                {
+                    nodes.push_back(edge.GetAPos());
+                }
+            }
+        }
+        else if (navCell.m_edgeId >= 0)
+        {
+            auto const& edge = m_edges[navCell.m_edgeId];
+            nodes.push_back(edge.GetAPos());
+            nodes.push_back(edge.GetBPos());
+        }
+        return nodes;
+    }
+
     /*bool CNavmesh::IsNode(SVec2 const pos) const
     {
         assert(m_navCells.IsValid(pos));
@@ -136,15 +165,13 @@ namespace SC2020
         auto& edge = m_edges.emplace_back();
         for(auto iter = path.begin() + 1; iter != (path.end() - 1); ++iter)
         {
-            auto& cell = m_navCells.GetElement(*iter);
+            auto& cell = m_navCells.ModifyElement(*iter);
             cell.m_edgeId = edgeId;
-            auto& cell2 = m_navCells.GetElement(*iter);
-            auto t = cell2.m_edgeId;
         }
 
         edge.m_path = path;
-        m_navCells.GetElement(edge.GetAPos()).m_node.m_edgeIds.push_back(edgeId);
-        m_navCells.GetElement(edge.GetBPos()).m_node.m_edgeIds.push_back(edgeId);
+        m_navCells.ModifyElement(edge.GetAPos()).m_node.m_edgeIds.push_back(edgeId);
+        m_navCells.ModifyElement(edge.GetBPos()).m_node.m_edgeIds.push_back(edgeId);
         //cerr << "Edge added: " << (SVec2i)edge.GetAPos() << " " << (SVec2i)edge.GetBPos() << "\n";
         return edgeId;
     }
