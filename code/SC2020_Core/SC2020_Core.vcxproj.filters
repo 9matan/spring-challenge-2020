@@ -16,6 +16,9 @@
     <Filter Include="Game\Navmesh">
       <UniqueIdentifier>{00398c68-51cc-4d32-b156-2885110ea885}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Bot\Pac">
+      <UniqueIdentifier>{44161a8d-15b9-49f7-ab9e-86d9ba7e0468}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="InputData.h">
@@ -64,6 +67,24 @@
     <ClInclude Include="InputDataMap.h">
       <Filter>Data</Filter>
     </ClInclude>
+    <ClInclude Include="PacEntity.h">
+      <Filter>Bot\Pac</Filter>
+    </ClInclude>
+    <ClInclude Include="PacGoal.h">
+      <Filter>Bot\Pac</Filter>
+    </ClInclude>
+    <ClInclude Include="PacAction.h">
+      <Filter>Bot\Pac</Filter>
+    </ClInclude>
+    <ClInclude Include="EPacType.h">
+      <Filter>Bot\Pac</Filter>
+    </ClInclude>
+    <ClInclude Include="PacHelper.h">
+      <Filter>Bot\Pac</Filter>
+    </ClInclude>
+    <ClInclude Include="BotImpl.h">
+      <Filter>Bot</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core_PCH.cpp" />
@@ -78,6 +99,12 @@
     </ClCompile>
     <ClCompile Include="Navmesh.cpp">
       <Filter>Game\Navmesh</Filter>
+    </ClCompile>
+    <ClCompile Include="PacHelper.cpp">
+      <Filter>Bot\Pac</Filter>
+    </ClCompile>
+    <ClCompile Include="BotImpl.cpp">
+      <Filter>Bot</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

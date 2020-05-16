@@ -9,6 +9,7 @@
 #include "Map.h"
 #include "MapHelper.h"
 #include "Navmesh.h"
+#include "PacHelper.h"
 
 #define RNG(container)  container.begin(), container.end()
 
@@ -70,7 +71,36 @@ namespace SC2020
             return res;
         }
 
-        // updates
+        inline SPacEntity& GetPacEntity(SBotData& botData, unsigned int const pacId, bool const isMine)
+        {
+            return *find_if(botData.m_pacs.begin(), botData.m_pacs.end(),
+                [pacId, isMine](SPacEntity const& pac)
+                {
+                    return pac.m_id == (unsigned char)pacId && pac.m_isMine == isMine;
+                });
+        }
+
+        void InitPacs(SBotData& botData, SInputData const& inData)
+        {
+            int const maxPacId = max_element(inData.m_visiblePacs.begin(), inData.m_visiblePacs.end(), 
+                [](SInputDataPac const& lhs, SInputDataPac const& rhs)
+                {
+                    return lhs.m_pacId < rhs.m_pacId;
+                })->m_pacId;
+
+            int const pacsCnt = (maxPacId + 1) * MAX_PLAYERS_CNT;
+            auto& pacs = botData.m_pacs;
+            botData.m_pacs.reserve(pacsCnt);
+            for (int i = 0; i < pacsCnt; ++i)
+            {
+                pacs[i].m_isMine = (i <= maxPacId);
+                pacs[i].m_id = ((pacs[i].m_isMine) ? (i) : (i - maxPacId - 1));
+            }
+        }
+
+        //
+        // UPDATES
+        //
         void UpdatePellets(SBotData& botData, SInputData const& inData)
         {
             // clear super pellets pos
@@ -111,6 +141,65 @@ namespace SC2020
                 cerr << "\n";
             }
         }
+
+        void UpdatePacs(SBotData& botData, SInputData const& inData)
+        {
+            assert(inData.m_visiblePacs.size() <= botData.m_pacs.size());
+
+            auto const& map = *botData.m_map;
+            CVectorInPlace<bool, MAX_PACS_CNT_PER_PLAYER> isPacVisible[2];
+            auto const pacSize = (botData.m_pacs.size() >> 1);
+            for (auto& isVisible : isPacVisible)
+            {
+                isVisible.resize(pacSize);
+                fill(RNG(isVisible), false);
+            }
+
+            for (auto& inDataPac : inData.m_visiblePacs)
+            {
+                isPacVisible[inDataPac.m_isMine ? 1 : 0][inDataPac.m_pacId] = true;
+
+                auto& pacEntity = GetPacEntity(botData, inDataPac.m_pacId, inDataPac.m_isMine);
+                if (map.IsValid(pacEntity.m_pos))
+                {
+                    pacEntity.m_lastVisiblePos = pacEntity.m_pos;
+                    pacEntity.m_lastVisibleTurn = botData.m_turnIndex - 1;
+                }
+                pacEntity.m_pos = SVec2(inDataPac.m_x, inDataPac.m_y);
+                pacEntity.m_abilityCooldown = inDataPac.m_abilityCooldown;
+                pacEntity.m_speedTurnsLeft = inDataPac.m_speedTurnsLeft;
+                pacEntity.m_pacType = ToPacType(inDataPac.m_typeId.c_str());
+            }
+
+            // update invisible enemies
+            // TODO: check wether an enemy pac is alive
+            auto const& isEnemyVisible = isPacVisible[0];
+            for (size_t i = 0; i < isEnemyVisible.size(); ++i)
+            {
+                if (isEnemyVisible[i])
+                {
+                    continue;
+                }
+                auto& pacEntity = GetPacEntity(botData, (unsigned int)i, false);
+                if (map.IsValid(pacEntity.m_pos))
+                {
+                    pacEntity.m_lastVisiblePos = pacEntity.m_pos;
+                    pacEntity.m_lastVisibleTurn = botData.m_turnIndex - 1;
+                }
+                pacEntity.m_pos = SVec2(-1, -1);
+            }
+
+            // update invisible own (dead)
+            auto const& isOwnVisible = isPacVisible[1];
+            for (size_t i = 0; i < isOwnVisible.size(); ++i)
+            {
+                if (isOwnVisible[i])
+                {
+                    continue;
+                }
+                GetPacEntity(botData, (unsigned int)i, true).m_isAlive = false;
+            }
+        }
     }
 
     CBot::CBot(SInitInputData const& initInData)
@@ -129,6 +218,7 @@ namespace SC2020
 
     SOutputData CBot::FirstUpdate(SInputData const& inData)
     {
+        InitPacs(m_data, inData);
         m_data.m_superPelletPos = GetSuperPelletPos(inData.m_visiblePellets);
         return Update(inData);
     }
@@ -137,7 +227,9 @@ namespace SC2020
     {
         SOutputData output;
 
+        m_data.m_turnIndex++;
         UpdatePellets(m_data, inData);
+        UpdatePacs(m_data, inData);
 
         CVectorInPlace<SVec2, MAX_MAP_AREA> superPellets;
         CVectorInPlace<SVec2, MAX_MAP_AREA> pellets;
