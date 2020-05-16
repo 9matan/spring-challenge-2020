@@ -78,20 +78,22 @@ int main()
 
     
     SC2020::CBot bot;
+    ReadInitInData(initInData);
+    ReadInData(inData);
     {
         PROFILE_TIME("First update");
-        ReadInitInData(initInData);
-        ReadInData(inData);
         auto const outData = bot.FirstUpdate(initInData, inData);
         PrintOutData(outData);
     }
 
     while (true)
     {
-        PROFILE_TIME("Update");
         ReadInData(inData);
-        auto const outData = bot.Update(inData);
-        PrintOutData(outData);
+        {
+            PROFILE_TIME("Update");
+            auto const outData = bot.Update(inData);
+            PrintOutData(outData);
+        }
     }
 
     return 0;
