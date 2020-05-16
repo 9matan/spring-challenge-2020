@@ -60,7 +60,7 @@ namespace SC2020
 
             int const pacsCnt = (maxPacId + 1) * MAX_PLAYERS_CNT;
             CVectorInPlace<SPacEntity, MAX_PACS_CNT_PER_PLAYER* MAX_PLAYERS_CNT> pacs;
-            pacs.reserve(pacsCnt);
+            pacs.resize(pacsCnt);
             for (int i = 0; i < pacsCnt; ++i)
             {
                 pacs[i].m_isMine = (i <= maxPacId);
@@ -83,6 +83,38 @@ namespace SC2020
                 }
             }
             return res;
+        }
+
+        SPacAction CreateMoveToAction(SVec2 const moveTo)
+        {
+            SPacAction action;
+            action.m_actionType = EPacActionType::MoveTo;
+            action.m_moveToPos = moveTo;
+            return action;
+        }
+
+        SOutputCommand CreateMoveToCommand(SVec2 const moveTo)
+        {
+            SOutputCommand cmd;
+            cmd.m_x = moveTo[0];
+            cmd.m_y = moveTo[1];
+            cmd.m_commandType = ECommandType::Move;
+            return cmd;
+        }
+
+        SOutputCommand CreateSpeedUpCommand()
+        {
+            SOutputCommand cmd;
+            cmd.m_commandType = ECommandType::SpeedUp;
+            return cmd;
+        }
+
+        SOutputCommand CreateSwitchTypeCommand(EPacType const pacType)
+        {
+            SOutputCommand cmd;
+            cmd.m_commandType = ECommandType::SwitchType;
+            cmd.m_pacType = ToString(pacType);
+            return cmd;
         }
     }
 
@@ -108,7 +140,6 @@ namespace SC2020
         UpdatePacs(inData);
         UpdatePellets(inData);
 
-        SOutputData output;
         // behaviour
         {
             CVectorInPlace<SVec2, MAX_MAP_AREA> superPellets;
@@ -131,20 +162,16 @@ namespace SC2020
                 }
             }
 
-            for (auto const& pac : inData.m_visiblePacs)
+            for (auto& pac : m_pacs)
             {
-                if (!pac.m_isMine)
-                {
-                    continue;
-                }
+                if (!pac.m_isMine || !pac.m_isAlive) continue;
 
-                SVec2 const pacPos(pac.m_x, pac.m_y);
                 SVec2 moveTo(0, 0);
                 if (!pellets.empty() || !superPellets.empty())
                 {
                     SVec2* moveToIter = !superPellets.empty()
-                        ? FindClosestPos(RNG(superPellets), pacPos)
-                        : FindClosestPos(RNG(pellets), pacPos);
+                        ? FindClosestPos(RNG(superPellets), pac.m_pos)
+                        : FindClosestPos(RNG(pellets), pac.m_pos);
 
                     if (!superPellets.empty())
                     {
@@ -161,17 +188,11 @@ namespace SC2020
                 {
                     moveTo = *GetRandomItem(RNG(m_floorCells));
                 }
-
-                SOutputCommand cmd;
-                cmd.m_commandType = ECommandType::Move;
-                cmd.m_pacId = pac.m_pacId;
-                cmd.m_x = moveTo[0];
-                cmd.m_y = moveTo[1];
-                output.m_commands.push_back(cmd);
+                pac.m_action = CreateMoveToAction(moveTo);
             }
         }
 
-        return output;
+        return CreateOutputData();
     }
 
     void CBotImpl::UpdatePellets(SInputData const& inData)
@@ -205,6 +226,7 @@ namespace SC2020
             m_map.GetCell(pelletPos).m_pelletScore = (float)pellet.m_value;
         }
 
+        /*
         for (size_t y = 0; y < m_map.GetHeight(); ++y)
         {
             for (size_t x = 0; x < m_map.GetWidth(); ++x)
@@ -213,6 +235,7 @@ namespace SC2020
             }
             cerr << "\n";
         }
+        */
     }
 
     void CBotImpl::UpdatePacs(SInputData const& inData)
@@ -232,7 +255,7 @@ namespace SC2020
             isPacVisible[inDataPac.m_isMine ? 1 : 0][inDataPac.m_pacId] = true;
 
             auto& pacEntity = GetPacEntity(inDataPac.m_pacId, inDataPac.m_isMine);
-            if (m_map.IsValid(pacEntity.m_pos))
+            if (m_map.IsValidPos(pacEntity.m_pos))
             {
                 pacEntity.m_lastVisiblePos = pacEntity.m_pos;
                 pacEntity.m_lastVisibleTurn = m_turnIndex - 1;
@@ -253,7 +276,7 @@ namespace SC2020
                 continue;
             }
             auto& pacEntity = GetPacEntity((unsigned int)i, false);
-            if (m_map.IsValid(pacEntity.m_pos))
+            if (m_map.IsValidPos(pacEntity.m_pos))
             {
                 pacEntity.m_lastVisiblePos = pacEntity.m_pos;
                 pacEntity.m_lastVisibleTurn = m_turnIndex - 1;
@@ -271,6 +294,36 @@ namespace SC2020
             }
             GetPacEntity((unsigned int)i, true).m_isAlive = false;
         }
+    }
+
+    SOutputData CBotImpl::CreateOutputData() const
+    {
+        SOutputData output;
+        for (auto const& pac : m_pacs)
+        {
+            if (!pac.m_isMine || !pac.m_isAlive) continue;
+
+            SOutputCommand cmd;
+            switch (pac.m_action.m_actionType)
+            {
+            case EPacActionType::Wait:
+                cmd = CreateMoveToCommand(pac.m_pos);
+                break;
+            case EPacActionType::MoveTo:
+                assert(m_map.IsValidPos(pac.m_action.m_moveToPos));
+                cmd = CreateMoveToCommand(pac.m_action.m_moveToPos);
+                break;
+            case EPacActionType::SpeedUp:
+                cmd = CreateSpeedUpCommand();
+                break;
+            case EPacActionType::SwitchType:
+                cmd = CreateSwitchTypeCommand(pac.m_action.m_pacType);
+                break;
+            }
+            cmd.m_pacId = pac.m_id;
+            output.m_commands.push_back(cmd);
+        }
+        return output;
     }
 
     SPacEntity& CBotImpl::GetPacEntity(unsigned int const pacId, bool const isMine)

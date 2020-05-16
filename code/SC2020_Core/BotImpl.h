@@ -27,6 +27,7 @@ namespace SC2020
     private:
         void UpdatePellets(SInputData const& inData);
         void UpdatePacs(SInputData const& inData);
+        SOutputData CreateOutputData() const;
 
         SPacEntity& GetPacEntity(unsigned int const pacId, bool const isMine);
     };

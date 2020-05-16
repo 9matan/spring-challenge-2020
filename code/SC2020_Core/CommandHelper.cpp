@@ -13,8 +13,11 @@ namespace SC2020
         case ECommandType::Move:
             sprintf(buff, "MOVE %i %i %i", cmd.m_pacId, cmd.m_x, cmd.m_y);
             break;
-        case ECommandType::Speed:
+        case ECommandType::SpeedUp:
             sprintf(buff, "SPEED %i", cmd.m_pacId);
+            break;
+        case ECommandType::SwitchType:
+            sprintf(buff, "SWITCH %i %s", cmd.m_pacId, cmd.m_pacType.c_str());
             break;
         default:
             assert(false);

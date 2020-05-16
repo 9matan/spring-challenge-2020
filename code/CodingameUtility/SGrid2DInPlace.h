@@ -25,7 +25,7 @@ public:
     inline size_t GetHeight() const { return m_height; }
     inline size_t GetSize() const { return m_elements.size(); }
 
-    inline bool IsValid(SVec2 const pos) const { return pos[0] >= 0 && pos[0] < m_width && pos[1] >= 0 && pos[1] < m_height; }
+    inline bool IsValidPos(SVec2 const pos) const { return pos[0] >= 0 && pos[0] < m_width && pos[1] >= 0 && pos[1] < m_height; }
     inline size_t GetIndex(SVec2 const pos) const { return pos[0] + pos[1] * m_width; }
 
     inline TElem* begin() { return m_elements.begin(); }
