@@ -93,6 +93,13 @@ namespace SC2020
             return action;
         }
 
+        SPacAction CreateSpeedUpAction()
+        {
+            SPacAction action;
+            action.m_actionType = EPacActionType::SpeedUp;
+            return action;
+        }
+
         SOutputCommand CreateMoveToCommand(SVec2 const moveTo)
         {
             SOutputCommand cmd;
@@ -165,6 +172,12 @@ namespace SC2020
             for (auto& pac : m_pacs)
             {
                 if (!pac.m_isMine || !pac.m_isAlive) continue;
+
+                if (pac.m_abilityCooldown == 0)
+                {
+                    pac.m_action = CreateSpeedUpAction();
+                    continue;
+                }
 
                 SVec2 moveTo(0, 0);
                 if (!pellets.empty() || !superPellets.empty())
