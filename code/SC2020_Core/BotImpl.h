@@ -5,6 +5,7 @@
 #include "Map.h"
 #include "Navmesh.h"
 #include "PacEntity.h"
+#include "Pathfinding.h"
 
 namespace SC2020
 {
@@ -20,6 +21,7 @@ namespace SC2020
         unsigned int m_turnIndex = 0;
         SMap m_map;
         CNavmesh m_navmesh;
+        CPathfinding m_pathfinding;
         std::vector<SVec2> m_initSuperPelletPos;
         CVectorInPlace<SPacEntity, MAX_PACS_CNT_PER_PLAYER* MAX_PLAYERS_CNT> m_pacs;
         CVectorInPlace<SVec2, MAX_MAP_AREA> m_floorCells;

@@ -22,6 +22,8 @@ public:
     inline void pop_back() { m_nxtSlotIndex--; }
     inline T& back() { return m_data[m_nxtSlotIndex - 1]; }
     inline T& front() { return *m_data; }
+    inline T const& back() const { return m_data[m_nxtSlotIndex - 1]; }
+    inline T const& front() const { return *m_data; }
     inline size_t size() const { return m_nxtSlotIndex; }
     inline void resize(size_t const capacity) { m_nxtSlotIndex = capacity; }
     inline void reserve(size_t const capacity) { assert(capacity <= TSize); }

@@ -1,6 +1,7 @@
 #include "Core_PCH.h"
 #include "BotImpl.h"
 
+#include "CodingameUtility\ContainerHelper.h"
 #include "CodingameUtility\Random.h"
 #include "CodingameUtility\Vec2Helper.h"
 
@@ -128,6 +129,7 @@ namespace SC2020
     CBotImpl::CBotImpl(SInitInputData const& initInData, SInputData const& inData)
         : m_map(BuildMap(initInData.m_map))
         , m_navmesh(m_map)
+        , m_pathfinding(&m_map, &m_navmesh)
         , m_pacs(CreatePacEntities(inData))
         , m_turnIndex(0)
         , m_floorCells(CollectFloorCells(initInData.m_map))
@@ -149,6 +151,17 @@ namespace SC2020
 
         // behaviour
         {
+            vector<SVec2> lockedPositions;
+            lockedPositions.reserve(m_pacs.size());
+            for (auto& pac : m_pacs)
+            {
+                if (!pac.m_isAlive || !m_map.IsValidPos(pac.m_pos))
+                {
+                    continue;
+                }
+                lockedPositions.push_back(pac.m_pos);
+            }
+
             CVectorInPlace<SVec2, MAX_MAP_AREA> superPellets;
             CVectorInPlace<SVec2, MAX_MAP_AREA> pellets;
             for (auto const& pellet : inData.m_visiblePellets)
@@ -179,29 +192,88 @@ namespace SC2020
                     continue;
                 }
 
-                SVec2 moveTo(0, 0);
+                
+                SVec2 goalPos(0, 0);
+                bool foundPellet = false;
                 if (!pellets.empty() || !superPellets.empty())
                 {
-                    SVec2* moveToIter = !superPellets.empty()
-                        ? FindClosestPos(RNG(superPellets), pac.m_pos)
-                        : FindClosestPos(RNG(pellets), pac.m_pos);
-
-                    if (!superPellets.empty())
+                    CVectorInPlace<SVec2, MAX_MAP_AREA> lockedSupers;
+                    CVectorInPlace<SVec2, MAX_MAP_AREA> lockedPellets;
+                    for (int tryIndex = 0; tryIndex < 10; ++tryIndex)
                     {
-                        superPellets.erase_swap(moveToIter);
-                    }
-                    else
-                    {
-                        pellets.erase_swap(moveToIter);
+                        bool const isSuper = !superPellets.empty();
+                        SVec2* goalPosIter = isSuper
+                            ? FindClosestPos(RNG(superPellets), pac.m_pos)
+                            : FindClosestPos(RNG(pellets), pac.m_pos);
+
+                        if (isSuper)
+                        {
+                            superPellets.erase_swap(goalPosIter);
+                        }
+                        else
+                        {
+                            pellets.erase_swap(goalPosIter);
+                        }
+
+                        goalPos = *goalPosIter;
+                        auto const path = m_pathfinding.FindNextSteps_ShortestPath(pac.m_pos, goalPos, lockedPositions, 2);
+                        if (path.back() != pac.m_pos)
+                        {
+                            foundPellet = true;
+                            break;
+                        }
+
+                        if (isSuper)
+                        {
+                            lockedSupers.push_back(goalPos);
+                        }
+                        else
+                        {
+                            lockedPellets.push_back(goalPos);
+                        }
                     }
 
-                    moveTo = *moveToIter;
+                    for (auto const lockedSuper : lockedSupers)
+                    {
+                        superPellets.push_back(lockedSuper);
+                    }
+                    for (auto const lockedPellet : lockedPellets)
+                    {
+                        pellets.push_back(lockedPellet);
+                    }
                 }
-                else
+
+                if(!foundPellet)
                 {
-                    moveTo = *GetRandomItem(RNG(m_floorCells));
+                    goalPos = *GetRandomItem(RNG(m_floorCells));
                 }
-                pac.m_action = CreateMoveToAction(moveTo);
+
+                EraseSwapWithLast(lockedPositions, pac.m_pos);                
+                auto const path = m_pathfinding.FindNextSteps_ShortestPath(pac.m_pos, goalPos, lockedPositions, 2);
+                pac.m_action = CreateMoveToAction(path.back());
+
+                string debugStr = "pacid: " + to_string(pac.m_id);
+                debugStr += "\n Goal pos: ";
+                debugStr += ToString(goalPos);
+                debugStr += "\n Locked positions: ";
+                for (auto const pos : lockedPositions)
+                {
+                    debugStr += ToString((SVec2i)pos);
+                    debugStr += " ";
+                }
+                debugStr += "\n Path: ";
+                for (auto const pos : path)
+                {
+                    debugStr += ToString((SVec2i)pos);
+                    debugStr += " ";
+                }
+                cerr << debugStr << "\n";
+
+                if(path.front() != pac.m_pos)
+                {
+                    lockedPositions.push_back(path.front());
+                }
+                lockedPositions.push_back(pac.m_pos);
             }
         }
 
