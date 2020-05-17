@@ -158,9 +158,15 @@
     <ClInclude Include="Cell.h" />
     <ClInclude Include="CommandHelper.h" />
     <ClInclude Include="Core_PCH.h" />
+    <ClInclude Include="EHeuristicsType.h" />
     <ClInclude Include="EPacType.h" />
     <ClInclude Include="GameConfig.h" />
     <ClInclude Include="GameGrid2D.h" />
+    <ClInclude Include="HeuristicsData.h" />
+    <ClInclude Include="HeuristicsEvalResult.h" />
+    <ClInclude Include="HeuristicsHelper.h" />
+    <ClInclude Include="Heuristics_Default.h" />
+    <ClInclude Include="Heuristics_GrabSuper.h" />
     <ClInclude Include="InputData.h" />
     <ClInclude Include="InputDataMap.h" />
     <ClInclude Include="Map.h" />
@@ -176,6 +182,11 @@
     <ClInclude Include="PacHelper.h" />
     <ClInclude Include="Pathfinding.h" />
     <ClInclude Include="PathfindingConfigs.h" />
+    <ClInclude Include="Strategy.h" />
+    <ClInclude Include="StrategyData.h" />
+    <ClInclude Include="StrategyExecutionContext.h" />
+    <ClInclude Include="StrategyHelper.h" />
+    <ClInclude Include="StrategyEvalResult.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CodingameUtility\CodingameUtility.vcxproj">
@@ -187,10 +198,14 @@
     <ClCompile Include="BotImpl.cpp" />
     <ClCompile Include="CommandHelper.cpp" />
     <ClCompile Include="Core_PCH.cpp" />
+    <ClCompile Include="HeuristicsHelper.cpp" />
+    <ClCompile Include="Heuristics_Default.cpp" />
+    <ClCompile Include="Heuristics_GrabSuper.cpp" />
     <ClCompile Include="MapHelper.cpp" />
     <ClCompile Include="Navmesh.cpp" />
     <ClCompile Include="PacHelper.cpp" />
     <ClCompile Include="Pathfinding.cpp" />
+    <ClCompile Include="StrategyHelper.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

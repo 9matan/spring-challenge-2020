@@ -3,18 +3,14 @@
 #include "CodingameUtility\Vec2.h"
 #include "CodingameUtility\VectorInPlace.h"
 
+#include "EHeuristicsType.h"
+
 namespace SC2020
 {
-    enum class EPacGoalType : unsigned char
-    {
-        GrabSuper = 0,
-        Explore
-    };
-
     struct SPacGoal
     {
-        EPacGoalType m_type;
         SVec2 m_goalPos = SVec2(-1, -1);
-        unsigned short m_updatedTurnIndex = 0;
+        // higher - more importance
+        EHeuristicsType m_heuristicsType = EHeuristicsType::Default;
     };
 }

@@ -7,6 +7,8 @@
 
 #include "MapHelper.h"
 #include "PacHelper.h"
+#include "StrategyData.h"
+#include "StrategyHelper.h"
 
 #define RNG(container)  container.begin(), container.end()
 
@@ -70,7 +72,7 @@ namespace SC2020
             return pacs;
         }
 
-        inline bool IsSuperPellet(float const score) { return score > 1.0f; }
+        inline bool IsSuperPellet(float const score) { return score > 1.1f; }
 
         vector<SVec2> GetSuperPelletPos(vector<SInputDataPellet> const& pellets)
         {
@@ -98,6 +100,13 @@ namespace SC2020
         {
             SPacAction action;
             action.m_actionType = EPacActionType::SpeedUp;
+            return action;
+        }
+
+        SPacAction CreateWaitAction()
+        {
+            SPacAction action;
+            action.m_actionType = EPacActionType::Wait;
             return action;
         }
 
@@ -148,134 +157,13 @@ namespace SC2020
         ++m_turnIndex;
         UpdatePacs(inData);
         UpdatePellets(inData);
-
-        // behaviour
+        ValidateGoals();
         {
-            vector<SVec2> lockedPositions;
-            lockedPositions.reserve(m_pacs.size());
-            for (auto& pac : m_pacs)
-            {
-                if (!pac.m_isAlive || !m_map.IsValidPos(pac.m_pos))
-                {
-                    continue;
-                }
-                lockedPositions.push_back(pac.m_pos);
-            }
-
-            CVectorInPlace<SVec2, MAX_MAP_AREA> superPellets;
-            CVectorInPlace<SVec2, MAX_MAP_AREA> pellets;
-            for (auto const& pellet : inData.m_visiblePellets)
-            {
-                if (pellet.m_value > 1)
-                {
-                    superPellets.push_back({ pellet.m_x , pellet.m_y });
-                }
-            }
-            for (size_t y = 0; y < m_map.GetHeight(); ++y)
-            {
-                for (size_t x = 0; x < m_map.GetWidth(); ++x)
-                {
-                    if (m_map.GetElement({ x, y }).m_pelletScore > 0.001f)
-                    {
-                        pellets.push_back({ x, y });
-                    }
-                }
-            }
-
-            for (auto& pac : m_pacs)
-            {
-                if (!pac.m_isMine || !pac.m_isAlive) continue;
-
-                if (pac.m_abilityCooldown == 0)
-                {
-                    pac.m_action = CreateSpeedUpAction();
-                    continue;
-                }
-
-                
-                SVec2 goalPos(0, 0);
-                bool foundPellet = false;
-                if (!pellets.empty() || !superPellets.empty())
-                {
-                    CVectorInPlace<SVec2, MAX_MAP_AREA> lockedSupers;
-                    CVectorInPlace<SVec2, MAX_MAP_AREA> lockedPellets;
-                    for (int tryIndex = 0; tryIndex < 10; ++tryIndex)
-                    {
-                        bool const isSuper = !superPellets.empty();
-                        SVec2* goalPosIter = isSuper
-                            ? FindClosestPos(RNG(superPellets), pac.m_pos)
-                            : FindClosestPos(RNG(pellets), pac.m_pos);
-
-                        if (isSuper)
-                        {
-                            superPellets.erase_swap(goalPosIter);
-                        }
-                        else
-                        {
-                            pellets.erase_swap(goalPosIter);
-                        }
-
-                        goalPos = *goalPosIter;
-                        auto const path = m_pathfinding.FindNextSteps_ShortestPath(pac.m_pos, goalPos, lockedPositions, 2);
-                        if (path.back() != pac.m_pos)
-                        {
-                            foundPellet = true;
-                            break;
-                        }
-
-                        if (isSuper)
-                        {
-                            lockedSupers.push_back(goalPos);
-                        }
-                        else
-                        {
-                            lockedPellets.push_back(goalPos);
-                        }
-                    }
-
-                    for (auto const lockedSuper : lockedSupers)
-                    {
-                        superPellets.push_back(lockedSuper);
-                    }
-                    for (auto const lockedPellet : lockedPellets)
-                    {
-                        pellets.push_back(lockedPellet);
-                    }
-                }
-
-                if(!foundPellet)
-                {
-                    goalPos = *GetRandomItem(RNG(m_floorCells));
-                }
-
-                EraseSwapWithLast(lockedPositions, pac.m_pos);                
-                auto const path = m_pathfinding.FindNextSteps_ShortestPath(pac.m_pos, goalPos, lockedPositions, 2);
-                pac.m_action = CreateMoveToAction(path.back());
-
-                string debugStr = "pacid: " + to_string(pac.m_id);
-                debugStr += "\n Goal pos: ";
-                debugStr += ToString(goalPos);
-                debugStr += "\n Locked positions: ";
-                for (auto const pos : lockedPositions)
-                {
-                    debugStr += ToString((SVec2i)pos);
-                    debugStr += " ";
-                }
-                debugStr += "\n Path: ";
-                for (auto const pos : path)
-                {
-                    debugStr += ToString((SVec2i)pos);
-                    debugStr += " ";
-                }
-                cerr << debugStr << "\n";
-
-                if(path.front() != pac.m_pos)
-                {
-                    lockedPositions.push_back(path.front());
-                }
-                lockedPositions.push_back(pac.m_pos);
-            }
+            auto const strategy = SelectStrategy();
+            auto const evaluationResult = EvaluateStrategy(strategy);
+            ApplyStrategyEvaluationResult(evaluationResult);
         }
+        ResolveActions();
 
         return CreateOutputData();
     }
@@ -339,7 +227,7 @@ namespace SC2020
         {
             isPacVisible[inDataPac.m_isMine ? 1 : 0][inDataPac.m_pacId] = true;
 
-            auto& pacEntity = GetPacEntity(inDataPac.m_pacId, inDataPac.m_isMine);
+            auto& pacEntity = GetPacEntity((unsigned char)inDataPac.m_pacId, inDataPac.m_isMine);
             if (m_map.IsValidPos(pacEntity.m_pos))
             {
                 pacEntity.m_lastVisiblePos = pacEntity.m_pos;
@@ -360,7 +248,7 @@ namespace SC2020
             {
                 continue;
             }
-            auto& pacEntity = GetPacEntity((unsigned int)i, false);
+            auto& pacEntity = GetPacEntity((unsigned char)i, false);
             if (m_map.IsValidPos(pacEntity.m_pos))
             {
                 pacEntity.m_lastVisiblePos = pacEntity.m_pos;
@@ -377,8 +265,173 @@ namespace SC2020
             {
                 continue;
             }
-            GetPacEntity((unsigned int)i, true).m_isAlive = false;
+            GetPacEntity((unsigned char)i, true).m_isAlive = false;
         }
+    }    
+
+    void CBotImpl::ValidateGoals()
+    {
+        auto const pacPositions = CollectPacPositions();
+        vector<SVec2> lockedPositions(pacPositions.begin(), pacPositions.end());
+
+        for (auto& pac : m_pacs)
+        {
+            if (!pac.m_isMine || !pac.m_isAlive) continue;
+            if (!m_map.IsValidPos(pac.m_goal.m_goalPos)) continue;
+
+            EraseSwapWithLast(lockedPositions, pac.m_pos);
+
+            bool resetTarget = (pac.m_goal.m_goalPos == pac.m_pos);
+            if (!resetTarget)
+            {
+                switch (pac.m_goal.m_heuristicsType)
+                {
+                case EHeuristicsType::Default:
+                {
+                    auto const paths = m_pathfinding.GetPathsToAdjacentCrossroads(pac.m_pos, lockedPositions);
+                    auto const foundIter = find_if(RNG(paths),
+                        [pos = pac.m_goal.m_goalPos](SNavmeshEdge::Path const& path)
+                    {
+                        return find(RNG(path), pos) != path.end();
+                    });
+                    resetTarget = (foundIter == paths.end());
+                }
+                break;
+                case EHeuristicsType::GrabSuper:
+                {
+                    resetTarget = !IsSuperPellet(m_map.GetCell(pac.m_goal.m_goalPos).m_pelletScore);
+                }
+                break;
+                default:
+                    assert(false);
+                    break;
+                }
+            }
+
+            if (resetTarget)
+            {
+                pac.m_goal.m_goalPos = SVec2(-1, -1);
+            }
+            lockedPositions.push_back(pac.m_pos);
+        }
+    }
+
+    SStrategy CBotImpl::SelectStrategy()
+    {
+        SStrategy strategy;
+        //strategy.m_heuristics.push_back(CreateHeuristicsEntry(EHeuristicsType::GrabSuper, 1.0f));
+        strategy.m_heuristics.push_back(CreateHeuristicsEntry(EHeuristicsType::Default, 1.0f));
+        return strategy;
+    }
+
+    SStrategyEvalResult CBotImpl::EvaluateStrategy(SStrategy const& strategy)
+    {
+        SStrategyEvalResult bestResult;
+        bestResult.m_totalScore = -numeric_limits<float>::max();
+
+        CVectorInPlace<unsigned int, MAX_PACS_CNT_PER_PLAYER> freePacIds;
+        int permutationCnt = 1;
+        int freeIndex = 0;
+        for (auto& pac : m_pacs)
+        {
+            if (!pac.m_isMine || !pac.m_isAlive) continue;
+            if (m_map.IsValidPos(pac.m_goal.m_goalPos)) continue;
+
+            permutationCnt *= (freeIndex + 1);
+            freePacIds.push_back(pac.m_id);
+            ++freeIndex;
+        }
+
+        cerr << "Perms cnt: " << permutationCnt << "\n";
+        for (int i = 0; i < permutationCnt; ++i)
+        {
+            SStrategyData strategyData;
+            strategyData.m_bot = this;
+            strategyData.m_pacIdsOrder = freePacIds;
+
+            auto const currentResult = SC2020::EvaluateStrategy(strategy, strategyData);
+            cerr << "Current result score: " << currentResult.m_totalScore << "\n";
+            if (currentResult.m_totalScore > bestResult.m_totalScore)
+            {
+                bestResult = currentResult;
+            }
+
+            next_permutation(RNG(freePacIds));
+        }
+
+        return bestResult;
+    }
+
+    void CBotImpl::ApplyStrategyEvaluationResult(SStrategyEvalResult const& strategyEvaluationResult)
+    {
+        for (auto const& pacGoalEntry : strategyEvaluationResult.m_pacGoals)
+        {
+            auto& pac = GetPacEntity(pacGoalEntry.m_pacId, true);
+            pac.m_goal.m_goalPos = pacGoalEntry.m_pacGoalPos;
+            pac.m_goal.m_heuristicsType = pacGoalEntry.m_heuristicsType;
+        }
+    }
+
+    void CBotImpl::ResolveActions()
+    {
+        CVectorInPlace<SPacEntity*, MAX_PACS_CNT_PER_PLAYER> pacs;
+        for (auto& pac : m_pacs)
+        {
+            if (!pac.m_isAlive || !pac.m_isMine) continue;
+            pacs.push_back(&pac);
+        }
+
+        sort(RNG(pacs),
+            [](SPacEntity const* lhs, SPacEntity const* rhs)
+            {
+                return (int)lhs->m_goal.m_heuristicsType < (int)rhs->m_goal.m_heuristicsType;
+            });
+        reverse(RNG(pacs));
+
+        {
+            auto const pacPositions = CollectPacPositions();
+            vector<SVec2> lockedPositions(pacPositions.begin(), pacPositions.end());
+
+            for (auto pac : pacs)
+            {
+                assert(m_map.IsValidPos(pac->m_goal.m_goalPos));
+                if (GetDistanceL1(pac->m_pos, pac->m_goal.m_goalPos) > 1 && pac->m_abilityCooldown == 0)
+                {
+                    pac->m_action = CreateSpeedUpAction();
+                    continue;
+                }
+                EraseSwapWithLast(lockedPositions, pac->m_pos);
+
+                auto const pathLength = (pac->m_speedTurnsLeft > 0 ? 2 : 1);
+                auto const path = m_pathfinding.FindNextSteps_ShortestPath(pac->m_pos, pac->m_goal.m_goalPos, lockedPositions, pathLength);
+                if (path.back() == pac->m_pos)
+                {
+                    pac->m_action = CreateWaitAction();
+                }
+                else
+                {
+                    pac->m_action = CreateMoveToAction(path.back());
+                    for (auto const pos : path)
+                    {
+                        lockedPositions.push_back(pos);
+                    }
+                }
+
+                lockedPositions.push_back(pac->m_pos);
+            }
+        }
+    }
+
+    CVectorInPlace<SVec2, MAX_PACS_CNT_PER_PLAYER* MAX_PLAYERS_CNT> CBotImpl::CollectPacPositions() const
+    {
+        CVectorInPlace<SVec2, MAX_PACS_CNT_PER_PLAYER* MAX_PLAYERS_CNT> result;
+
+        for (auto const& pac : m_pacs)
+        {
+            if (!pac.m_isAlive || !m_map.IsValidPos(pac.m_pos)) continue;
+            result.push_back(pac.m_pos);
+        }
+        return result;
     }
 
     SOutputData CBotImpl::CreateOutputData() const
@@ -411,12 +464,12 @@ namespace SC2020
         return output;
     }
 
-    SPacEntity& CBotImpl::GetPacEntity(unsigned int const pacId, bool const isMine)
+    SPacEntity& CBotImpl::GetPacEntity(unsigned char const pacId, bool const isMine)
     {
         return *std::find_if(m_pacs.begin(), m_pacs.end(),
             [pacId, isMine](SPacEntity const& pac)
             {
-                return pac.m_id == (unsigned char)pacId && pac.m_isMine == isMine;
+                return pac.m_id == pacId && pac.m_isMine == isMine;
             });
     }
 }

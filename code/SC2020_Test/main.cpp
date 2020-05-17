@@ -67,6 +67,17 @@ void Pathfinding_FindNextSteps_ShortestPath_TestCase(
     }
 }
 
+void Pathfinding_FindClosestPosition_TestCase(
+    CPathfinding const& pathfinding,
+    SVec2 const from,
+    vector<SVec2> const& to,
+    vector<SVec2> const& lockedPositions,
+    SVec2 const expectedPos)
+{
+    auto const closestDistanceInfo = pathfinding.FindClosestPosition(from, to, lockedPositions);
+    assert(closestDistanceInfo.m_pos == expectedPos);
+}
+
 void RunTests()
 {
     // MapHelper GetVisibleCells
@@ -126,6 +137,20 @@ void RunTests()
             , { {11, 6} } // lockedPositions
             , MAX_PATHFINDING_PATH_LENGTH // maxPathLength
             , { {10, 3}, {11, 3}, {11, 4}, {11, 5}, {10, 5}, {9, 5}, {9, 6}, {9, 7}, {9, 8} }// expectedPathPrefix
+        );
+    }
+
+    // Pathfinding FindClosestPosition
+    {
+        auto const map = BuildMap(g_mapSamples[0]);
+        CNavmesh navmesh(map);
+        CPathfinding pathfinding(&map, &navmesh);
+
+        Pathfinding_FindClosestPosition_TestCase(pathfinding
+            , { 17, 3 } // from
+            , { {13, 3}, {19, 5}, {20, 1} } // to
+            , {} // lockedPositions
+            , {19, 5} // expectedPos
         );
     }
 }

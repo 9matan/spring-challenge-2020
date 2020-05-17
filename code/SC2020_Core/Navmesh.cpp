@@ -36,11 +36,11 @@ namespace SC2020
                 auto const& edgePath = edge.m_path;
                 if (edge.GetAPos() == pos)
                 {
-                    paths.emplace_back(edgePath.begin(), edgePath.end());
+                    paths.emplace_back(edgePath.begin() + 1, edgePath.end());
                 }
                 else
                 {
-                    paths.emplace_back(edgePath.rbegin(), edgePath.rend());
+                    paths.emplace_back(edgePath.rbegin() + 1, edgePath.rend());
                 }
             }
         }

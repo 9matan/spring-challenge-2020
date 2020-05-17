@@ -9,5 +9,7 @@
 #include <vector>
 #include <string>
 #include <queue>
+#include <numeric>
+#include <iostream>
 
 #include "GameConfig.h"

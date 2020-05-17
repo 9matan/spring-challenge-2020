@@ -22,6 +22,15 @@
     <Filter Include="Bot\Pathfinding">
       <UniqueIdentifier>{827625c0-3f79-4be4-92aa-333e837470aa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Bot\Strategy">
+      <UniqueIdentifier>{055c5ca0-561a-49dc-a428-8751b36259e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Bot\Strategy\Heuristics">
+      <UniqueIdentifier>{e3cee04d-def9-4cdb-90bd-3b85c548c09f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Bot\Strategy\Heuristics\Types">
+      <UniqueIdentifier>{bff31e86-e803-4c49-830f-23a1d2e83ea5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="InputData.h">
@@ -91,6 +100,39 @@
     <ClInclude Include="PathfindingConfigs.h">
       <Filter>Bot\Pathfinding</Filter>
     </ClInclude>
+    <ClInclude Include="EHeuristicsType.h">
+      <Filter>Bot\Strategy\Heuristics</Filter>
+    </ClInclude>
+    <ClInclude Include="StrategyHelper.h">
+      <Filter>Bot\Strategy</Filter>
+    </ClInclude>
+    <ClInclude Include="StrategyEvalResult.h">
+      <Filter>Bot\Strategy</Filter>
+    </ClInclude>
+    <ClInclude Include="StrategyData.h">
+      <Filter>Bot\Strategy</Filter>
+    </ClInclude>
+    <ClInclude Include="StrategyExecutionContext.h">
+      <Filter>Bot\Strategy</Filter>
+    </ClInclude>
+    <ClInclude Include="Strategy.h">
+      <Filter>Bot\Strategy</Filter>
+    </ClInclude>
+    <ClInclude Include="HeuristicsEvalResult.h">
+      <Filter>Bot\Strategy\Heuristics</Filter>
+    </ClInclude>
+    <ClInclude Include="HeuristicsHelper.h">
+      <Filter>Bot\Strategy\Heuristics</Filter>
+    </ClInclude>
+    <ClInclude Include="HeuristicsData.h">
+      <Filter>Bot\Strategy\Heuristics</Filter>
+    </ClInclude>
+    <ClInclude Include="Heuristics_Default.h">
+      <Filter>Bot\Strategy\Heuristics\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Heuristics_GrabSuper.h">
+      <Filter>Bot\Strategy\Heuristics\Types</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core_PCH.cpp" />
@@ -114,6 +156,18 @@
     </ClCompile>
     <ClCompile Include="Pathfinding.cpp">
       <Filter>Bot\Pathfinding</Filter>
+    </ClCompile>
+    <ClCompile Include="StrategyHelper.cpp">
+      <Filter>Bot\Strategy</Filter>
+    </ClCompile>
+    <ClCompile Include="HeuristicsHelper.cpp">
+      <Filter>Bot\Strategy\Heuristics</Filter>
+    </ClCompile>
+    <ClCompile Include="Heuristics_Default.cpp">
+      <Filter>Bot\Strategy\Heuristics\Types</Filter>
+    </ClCompile>
+    <ClCompile Include="Heuristics_GrabSuper.cpp">
+      <Filter>Bot\Strategy\Heuristics\Types</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
